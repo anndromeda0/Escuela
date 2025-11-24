@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Académico - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; }
+        
+        .nav-item {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-item:hover {
+            transform: translateY(-2px);
+        }
+        
+        .nav-item.active {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+        
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 8px solid #f8fafc;
+        }
+        
+        .content-section {
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dropdown {
+            display: none;
+        }
+        
+        .dropdown.show {
+            display: block;
+            animation: dropdownFade 0.2s ease-out;
+        }
+        
+        @keyframes dropdownFade {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .subject-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .subject-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .synergy-connection {
+            border-left: 3px solid #3b82f6;
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.1) 0%, transparent 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header Navigation -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center mr-3">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3z"/>
+                        </svg>
+                    </div>
+                    <h1 class="text-xl font-semibold text-gray-900">Portal Académico</h1>
+                </div>
+
+                <!-- Navigation Menu -->
+                <nav class="hidden md:flex space-x-1">
+                    <button onclick="showSection('malla')" class="nav-item active px-4 py-2 rounded-lg font-medium text-sm">
+                        Malla Curricular
+                    </button>
+                    <button onclick="showSection('recomendaciones')" class="nav-item px-4 py-2 rounded-lg font-medium text-sm text-gray-700 hover:bg-gray-100">
+                        Recomendaciones de Materias
+                    </button>
+                    <button onclick="showSection('guia')" class="nav-item px-4 py-2 rounded-lg font-medium text-sm text-gray-700 hover:bg-gray-100">
+                        Guía Académica
+                    </button>
+                    <button onclick="showSection('informacion')" class="nav-item px-4 py-2 rounded-lg font-medium text-sm text-gray-700 hover:bg-gray-100">
+                        Información
+                    </button>
+                </nav>
+
+                <!-- User Menu -->
+                <div class="relative">
+                    <button onclick="toggleUserMenu()" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                        <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <span class="hidden sm:block text-sm font-medium text-gray-700">Juan Pérez</span>
+                        <svg class="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                    
+                    <!-- Dropdown Menu -->
+                    <div id="user-dropdown" class="dropdown absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                        <div class="py-2">
+                            <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <svg class="w-4 h-4 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                                </svg>
+                                Mi Perfil
+                            </a>
+                            <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <svg class="w-4 h-4 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
+                                </svg>
+                                Configuración
+                            </a>
+                            <hr class="my-2">
+                            <button onclick="logout()" class="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                <svg class="w-4 h-4 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/>
+                                </svg>
+                                Cerrar Sesión
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg hover:bg-gray-100">
+                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div id="mobile-menu" class="md:hidden hidden border-t border-gray-200 bg-white">
+            <div class="px-4 py-2 space-y-1">
+                <button onclick="showSection('malla')" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-blue-600 bg-blue-50">
+                    Malla Curricular
+                </button>
+                <button onclick="showSection('recomendaciones')" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">
+                    Recomendaciones de Materias
+                </button>
+                <button onclick="showSection('guia')" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">
+                    Guía Académica
+                </button>
+                <button onclick="showSection('informacion')" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">
+                    Información
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Malla Curricular Section -->
+        <section id="malla-section" class="content-section active">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Malla Curricular</h2>
+                <p class="text-gray-600">Materias organizadas por semestre académico</p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                <!-- Primer Semestre -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-gray-900">1er Semestre</h3>
+                        <span class="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">Completado</span>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="subject-card p-3 bg-green-50 rounded-lg border border-green-200">
+                            <h4 class="font-medium text-gray-900">Matemáticas I</h4>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-sm text-gray-600">6 créditos</span>
+                                <span class="text-sm font-medium text-green-600">9.2</span>
+                            </div>
+                        </div>
+                        <div class="subject-card p-3 bg-green-50 rounded-lg border border-green-200">
+                            <h4 class="font-medium text-gray-900">Física I</h4>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-sm text-gray-600">6 créditos</span>
+                                <span class="text-sm font-medium text-green-600">8.7</span>
+                            </div>
+                        </div>
+                        <div class="subject-card p-3 bg-green-50 rounded-lg border border-green-200">
+                            <h4 class="font-medium text-gray-900">Química General</h4>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-sm text-gray-600">4 créditos</span>
+                                <span class="text-sm font-medium text-green-600">8.9</span>
+                            </div>
+                        </div>
+                        <div class="subject-card p-3 bg-green-50 rounded-lg border border-green-200">
+                            <h4 class="font-medium text-gray-900">Introducción a la Ingeniería</h4>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-sm text-gray-600">3 créditos</span>
+                                <span class="text-sm font-medium text-green-600">9.5</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Segundo Semestre -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-gray-900">2do Semestre</h3>
+                        <span class="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">En Curso</span>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="subject-card p-3 bg-blue-50 rounded-lg border border-blue-200">
+                            <h4 class="font-medium text-gray-900">Matemáticas II</h4>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-sm text-gray-600">6 créditos</span>
+                                <span class="text-sm font-medium text-blue-600">En curso</span>
+                            </div>
+                        </div>
+                        <div class="subject-card p-3 bg-blue-50 rounded-lg border border-blue-200">
+                            <h4 class="font-medium text-gray-900">Física II</h4>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-sm text-gray-600">6 créditos</span>
+                                <span class="text-sm font-medium text-blue-600">En curso</span>
+                            </div>
+                        </div>
+                        <div class="subject-card p-3 bg-blue-50 rounded-lg border border-blue-200">
+                            <h4 class="font-medium text-gray-900">Programación I</h4>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-sm text-gray-600">8 créditos</span>
+                                <span class="text-sm font-medium text-blue-600">En curso</span>
+                            </div>
+                        </div>
+                        <div class="subject-card p-3 bg-blue-50 rounded-lg border border-blue-200">
+                            <h4 class="font-medium text-gray-900">Álgebra Lineal</h4>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-sm text-gray-600">5 créditos</span>
+                                <span class="text-sm font-medium text-blue-600">En curso</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tercer Semestre -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-gray-900">3er Semestre</h3>
+                        <span class="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full">Pendiente</span>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="subject-card p-3 bg-gray-50 rounded-lg border border-gray-200">
+                            <h4 class="font-medium text-gray-700">Cálculo Diferencial</h4>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-sm text-gray-500">6 créditos</span>
+                                <span class="text-sm text-gray-400">Pendiente</span>
+                            </div>
+                        </div>
+                        <div class="subject-card p-3 bg-gray-50 rounded-lg border border-gray-200">
+                            <h4 class="font-medium text-gray-700">Programación II</h4>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-sm text-gray-500">8 créditos</span>
+                                <span class="text-sm text-gray-400">Pendiente</span>
+                            </div>
+                        </div>
+                        <div class="subject-card p-3 bg-gray-50 rounded-lg border border-gray-200">
+                            <h4 class="font-medium text-gray-700">Estructuras de Datos</h4>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-sm text-gray-500">7 créditos</span>
+                                <span class="text-sm text-gray-400">Pendiente</span>
+                            </div>
+                        </div>
+                        <div class="subject-card p-3 bg-gray-50 rounded-lg border border-gray-200">
+                            <h4 class="font-medium text-gray-700">Probabilidad y Estadística</h4>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-sm text-gray-500">5 créditos</span>
+                                <span class="text-sm text-gray-400">Pendiente</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cuarto Semestre -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-gray-900">4to Semestre</h3>
+                        <span class="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full">Pendiente</span>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="subject-card p-3 bg-gray-50 rounded-lg border border-gray-200">
+                            <h4 class="font-medium text-gray-700">Cálculo Integral</h4>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-sm text-gray-500">6 créditos</span>
+                                <span class="text-sm text-gray-400">Pendiente</span>
+                            </div>
+                        </div>
+                        <div class="subject-card p-3 bg-gray-50 rounded-lg border border-gray-200">
+                            <h4 class="font-medium text-gray-700">Base de Datos</h4>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-sm text-gray-500">7 créditos</span>
+                                <span class="text-sm text-gray-400">Pendiente</span>
+                            </div>
+                        </div>
+                        <div class="subject-card p-3 bg-gray-50 rounded-lg border border-gray-200">
+                            <h4 class="font-medium text-gray-700">Algoritmos</h4>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-sm text-gray-500">6 créditos</span>
+                                <span class="text-sm text-gray-400">Pendiente</span>
+                            </div>
+                        </div>
+                        <div class="subject-card p-3 bg-gray-50 rounded-lg border border-gray-200">
+                            <h4 class="font-medium text-gray-700">Sistemas Operativos</h4>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-sm text-gray-500">6 créditos</span>
+                                <span class="text-sm text-gray-400">Pendiente</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quinto Semestre -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-gray-900">5to Semestre</h3>
+                        <span class="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full">Pendiente</span>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="subject-card p-3 bg-gray-50 rounded-lg border border-gray-200">
+                            <h4 class="font-medium text-gray-700">Ingeniería de Software</h4>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-sm text-gray-500">8 créditos</span>
+                                <span class="text-sm text-gray-400">Pendiente</span>
+                            </div>
+                        </div>
+                        <div class="subject-card p-3 bg-gray-50 rounded-lg border border-gray-200">
+                            <h4 class="font-medium text-gray-700">Redes de Computadoras</h4>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-sm text-gray-500">6 créditos</span>
+                                <span class="text-sm text-gray-400">Pendiente</span>
+                            </div>
+                        </div>
+                        <div class="subject-card p-3 bg-gray-50 rounded-lg border border-gray-200">
+                            <h4 class="font-medium text-gray-700">Arquitectura de Computadoras</h4>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-sm text-gray-500">6 créditos</span>
+                                <span class="text-sm text-gray-400">Pendiente</span>
+                            </div>
+                        </div>
+                        <div class="subject-card p-3 bg-gray-50 rounded-lg border border-gray-200">
+                            <h4 class="font-medium text-gray-700">Métodos Numéricos</h4>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-sm text-gray-500">5 créditos</span>
+                                <span class="text-sm text-gray-400">Pendiente</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sexto Semestre -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-gray-900">6to Semestre</h3>
+                        <span class="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full">Pendiente</span>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="subject-card p-3 bg-gray-50 rounded-lg border border-gray-200">
+                            <h4 class="font-medium text-gray-700">Desarrollo Web</h4>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-sm text-gray-500">7 créditos</span>
+                                <span class="text-sm text-gray-400">Pendiente</span>
+                            </div>
+                        </div>
+                        <div class="subject-card p-3 bg-gray-50 rounded-lg border border-gray-200">
+                            <h4 class="font-medium text-gray-700">Inteligencia Artificial</h4>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-sm text-gray-500">6 créditos</span>
+                                <span class="text-sm text-gray-400">Pendiente</span>
+                            </div>
+                        </div>
+                        <div class="subject-card p-3 bg-gray-50 rounded-lg border border-gray-200">
+                            <h4 class="font-medium text-gray-700">Seguridad Informática</h4>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-sm text-gray-500">5 créditos</span>
+                                <span class="text-sm text-gray-400">Pendiente</span>
+                            </div>
+                        </div>
+                        <div class="subject-card p-3 bg-gray-50 rounded-lg border border-gray-200">
+                            <h4 class="font-medium text-gray-700">Proyecto Final</h4>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-sm text-gray-500">10 créditos</span>
+                                <span class="text-sm text-gray-400">Pendiente</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recomendaciones Section -->
+        <section id="recomendaciones-section" class="content-section">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Recomendaciones de Materias</h2>
+                <p class="text-gray-600">Sinergias y combinaciones ideales entre materias</p>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Sinergia 1 -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-start space-x-4">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Matemáticas II + Física II</h3>
+                            <p class="text-gray-600 mb-4">Estas materias se complementan perfectamente. Los conceptos de cálculo diferencial e integral en Matemáticas II son fundamentales para resolver problemas de electromagnetismo y ondas en Física II.</p>
+                            <div class="synergy-connection pl-4 py-3 rounded-r-lg">
+                                <div class="flex items-center space-x-4 text-sm">
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded">Matemáticas II</span>
+                                    <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded">Física II</span>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-2">💡 <strong>Beneficio:</strong> Los ejercicios de derivadas e integrales te ayudarán directamente en los cálculos de campos eléctricos y magnéticos.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sinergia 2 -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-start space-x-4">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Programación I + Álgebra Lineal</h3>
+                            <p class="text-gray-600 mb-4">Combinación ideal para desarrollar habilidades de programación con fundamentos matemáticos sólidos. El álgebra lineal proporciona las bases para algoritmos y estructuras de datos.</p>
+                            <div class="synergy-connection pl-4 py-3 rounded-r-lg">
+                                <div class="flex items-center space-x-4 text-sm">
+                                    <span class="px-2 py-1 bg-green-100 text-green-800 rounded">Programación I</span>
+                                    <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span class="px-2 py-1 bg-green-100 text-green-800 rounded">Álgebra Lineal</span>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-2">💡 <strong>Beneficio:</strong> Podrás implementar algoritmos de matrices y vectores mientras aprendes los conceptos teóricos.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sinergia 3 -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-start space-x-4">
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <svg class="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Estructuras de Datos + Algoritmos</h3>
+                            <p class="text-gray-600 mb-4">Secuencia natural y altamente recomendada. Estructuras de Datos te enseña las herramientas, mientras que Algoritmos te muestra cómo usarlas eficientemente.</p>
+                            <div class="synergy-connection pl-4 py-3 rounded-r-lg">
+                                <div class="flex items-center space-x-4 text-sm">
+                                    <span class="px-2 py-1 bg-purple-100 text-purple-800 rounded">Estructuras de Datos</span>
+                                    <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span class="px-2 py-1 bg-purple-100 text-purple-800 rounded">Algoritmos</span>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-2">💡 <strong>Beneficio:</strong> Dominarás tanto la implementación como la optimización de soluciones computacionales.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sinergia 4 -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-start space-x-4">
+                        <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <svg class="w-6 h-6 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Base de Datos + Desarrollo Web</h3>
+                            <p class="text-gray-600 mb-4">Combinación perfecta para el desarrollo de aplicaciones completas. Base de Datos te da los fundamentos del backend, mientras que Desarrollo Web te enseña el frontend.</p>
+                            <div class="synergy-connection pl-4 py-3 rounded-r-lg">
+                                <div class="flex items-center space-x-4 text-sm">
+                                    <span class="px-2 py-1 bg-orange-100 text-orange-800 rounded">Base de Datos</span>
+                                    <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span class="px-2 py-1 bg-orange-100 text-orange-800 rounded">Desarrollo Web</span>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-2">💡 <strong>Beneficio:</strong> Podrás crear aplicaciones web completas con persistencia de datos desde el primer día.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sinergia 5 -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-start space-x-4">
+                        <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <svg class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Probabilidad y Estadística + Inteligencia Artificial</h3>
+                            <p class="text-gray-600 mb-4">Los conceptos estadísticos y probabilísticos son fundamentales para entender algoritmos de machine learning y técnicas de IA.</p>
+                            <div class="synergy-connection pl-4 py-3 rounded-r-lg">
+                                <div class="flex items-center space-x-4 text-sm">
+                                    <span class="px-2 py-1 bg-red-100 text-red-800 rounded">Probabilidad y Estadística</span>
+                                    <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span class="px-2 py-1 bg-red-100 text-red-800 rounded">Inteligencia Artificial</span>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-2">💡 <strong>Beneficio:</strong> Comprenderás la base matemática detrás de algoritmos de aprendizaje automático y redes neuronales.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Guía Académica Section -->
+        <section id="guia-section" class="content-section">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Guía Académica</h2>
+                <p class="text-gray-600">Reglamentos, procedimientos y guías de materias</p>
+            </div>
+
+            <div class="grid lg:grid-cols-4 gap-6">
+                <!-- Sidebar Navigation -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-200 sticky top-8">
+                        <h3 class="font-semibold text-gray-900 mb-4">Secciones</h3>
+                        <nav class="space-y-2">
+                            <button onclick="showGuideSection('reglamentos')" class="guide-nav-item active w-full text-left px-3 py-2 rounded-lg text-sm font-medium bg-blue-50 text-blue-700">
+                                Reglamentos
+                            </button>
+                            <button onclick="showGuideSection('becas')" class="guide-nav-item w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">
+                                Becas y Apoyos
+                            </button>
+                            <button onclick="showGuideSection('procedimientos')" class="guide-nav-item w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">
+                                Procedimientos Especiales
+                            </button>
+                            <button onclick="showGuideSection('materias')" class="guide-nav-item w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">
+                                Guías de Materias
+                            </button>
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- Content Area -->
+                <div class="lg:col-span-3">
+                    <!-- Reglamentos -->
+                    <div id="reglamentos-content" class="guide-content active">
+                        <h3 class="text-2xl font-semibold text-gray-900 mb-6">Reglamentos Académicos</h3>
+                        <div class="space-y-6">
+                            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                                <h4 class="text-lg font-semibold text-gray-900 mb-3">Reglamento General de Estudiantes</h4>
+                                <div class="space-y-3 text-sm text-gray-700">
+                                    <p><strong>Artículo 1:</strong> Todo estudiante debe mantener un promedio mínimo de 7.0 para continuar en el programa.</p>
+                                    <p><strong>Artículo 2:</strong> La asistencia mínima requerida es del 80% para tener derecho a examen final.</p>
+                                    <p><strong>Artículo 3:</strong> Los estudiantes pueden reprobar máximo 2 materias por semestre sin consecuencias académicas.</p>
+                                    <p><strong>Artículo 4:</strong> El plagio académico resultará en la reprobación automática de la materia.</p>
+                                </div>
+                                <button class="mt-4 text-blue-600 text-sm font-medium hover:text-blue-800">Ver reglamento completo →</button>
+                            </div>
+
+                            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                                <h4 class="text-lg font-semibold text-gray-900 mb-3">Reglamento de Evaluación</h4>
+                                <div class="space-y-3 text-sm text-gray-700">
+                                    <p><strong>Evaluación Continua:</strong> 40% del total de la calificación</p>
+                                    <p><strong>Exámenes Parciales:</strong> 35% del total de la calificación</p>
+                                    <p><strong>Examen Final:</strong> 25% del total de la calificación</p>
+                                    <p><strong>Trabajos y Proyectos:</strong> Pueden sustituir hasta el 15% de la evaluación continua</p>
+                                </div>
+                                <button class="mt-4 text-blue-600 text-sm font-medium hover:text-blue-800">Ver detalles de evaluación →</button>
+                            </div>
+
+                            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                                <h4 class="text-lg font-semibold text-gray-900 mb-3">Código de Conducta</h4>
+                                <div class="space-y-3 text-sm text-gray-700">
+                                    <p>• Respetar a compañeros, profesores y personal administrativo</p>
+                                    <p>• Mantener la integridad académica en todos los trabajos</p>
+                                    <p>• Cuidar las instalaciones y equipos de la universidad</p>
+                                    <p>• Cumplir con los horarios establecidos para clases y actividades</p>
+                                </div>
+                                <button class="mt-4 text-blue-600 text-sm font-medium hover:text-blue-800">Ver código completo →</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Becas y Apoyos -->
+                    <div id="becas-content" class="guide-content">
+                        <h3 class="text-2xl font-semibold text-gray-900 mb-6">Becas y Apoyos Financieros</h3>
+                        <div class="space-y-6">
+                            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4zM18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="text-lg font-semibold text-gray-900 mb-2">Beca de Excelencia Académica</h4>
+                                        <p class="text-gray-600 mb-3">Para estudiantes con promedio superior a 9.0</p>
+                                        <div class="text-sm text-gray-700 space-y-1">
+                                            <p><strong>Cobertura:</strong> 100% de colegiatura</p>
+                                            <p><strong>Requisitos:</strong> Promedio ≥ 9.0, sin materias reprobadas</p>
+                                            <p><strong>Renovación:</strong> Semestral</p>
+                                        </div>
+                                        <button class="mt-3 px-4 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700">Aplicar</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="text-lg font-semibold text-gray-900 mb-2">Apoyo Socioeconómico</h4>
+                                        <p class="text-gray-600 mb-3">Para estudiantes con necesidades económicas</p>
+                                        <div class="text-sm text-gray-700 space-y-1">
+                                            <p><strong>Cobertura:</strong> 25% - 75% de colegiatura</p>
+                                            <p><strong>Requisitos:</strong> Estudio socioeconómico, promedio ≥ 7.5</p>
+                                            <p><strong>Documentos:</strong> Comprobantes de ingresos familiares</p>
+                                        </div>
+                                        <button class="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700">Aplicar</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                                            <path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="text-lg font-semibold text-gray-900 mb-2">Beca Trabajo-Estudio</h4>
+                                        <p class="text-gray-600 mb-3">Trabajo de medio tiempo en la universidad</p>
+                                        <div class="text-sm text-gray-700 space-y-1">
+                                            <p><strong>Beneficio:</strong> Salario + 50% descuento en colegiatura</p>
+                                            <p><strong>Horario:</strong> 20 horas semanales</p>
+                                            <p><strong>Áreas:</strong> Biblioteca, laboratorios, administración</p>
+                                        </div>
+                                        <button class="mt-3 px-4 py-2 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700">Aplicar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Procedimientos Especiales -->
+                    <div id="procedimientos-content" class="guide-content">
+                        <h3 class="text-2xl font-semibold text-gray-900 mb-6">Procedimientos Especiales</h3>
+                        <div class="space-y-6">
+                            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                                <h4 class="text-lg font-semibold text-gray-900 mb-4">Cambio de Carrera</h4>
+                                <div class="space-y-4">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                            <span class="text-xs font-medium text-blue-600">1</span>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-900">Solicitud por escrito</p>
+                                            <p class="text-xs text-gray-600">Dirigida al Coordinador Académico con justificación</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                            <span class="text-xs font-medium text-blue-600">2</span>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-900">Evaluación académica</p>
+                                            <p class="text-xs text-gray-600">Revisión de expediente y materias cursadas</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                            <span class="text-xs font-medium text-blue-600">3</span>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-900">Aprobación del comité</p>
+                                            <p class="text-xs text-gray-600">Decisión en un plazo máximo de 15 días hábiles</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="mt-4 text-blue-600 text-sm font-medium hover:text-blue-800">Iniciar trámite →</button>
+                            </div>
+
+                            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                                <h4 class="text-lg font-semibold text-gray-900 mb-4">Baja Temporal</h4>
+                                <div class="space-y-3 text-sm text-gray-700">
+                                    <p><strong>Duración máxima:</strong> 2 semestres consecutivos</p>
+                                    <p><strong>Requisitos:</strong> Estar al corriente en pagos, no tener materias en curso</p>
+                                    <p><strong>Proceso:</strong> Solicitud 30 días antes del inicio del semestre</p>
+                                    <p><strong>Reincorporación:</strong> Automática al presentar solicitud de reinscripción</p>
+                                </div>
+                                <button class="mt-4 text-blue-600 text-sm font-medium hover:text-blue-800">Solicitar baja temporal →</button>
+                            </div>
+
+                            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                                <h4 class="text-lg font-semibold text-gray-900 mb-4">Revalidación de Materias</h4>
+                                <div class="space-y-3 text-sm text-gray-700">
+                                    <p><strong>Materias elegibles:</strong> Cursadas en instituciones reconocidas por SEP</p>
+                                    <p><strong>Calificación mínima:</strong> 8.0 o equivalente</p>
+                                    <p><strong>Documentos requeridos:</strong> Certificado oficial, programa de estudios</p>
+                                    <p><strong>Costo:</strong> $500 pesos por materia evaluada</p>
+                                </div>
+                                <button class="mt-4 text-blue-600 text-sm font-medium hover:text-blue-800">Iniciar revalidación →</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Guías de Materias -->
+                    <div id="materias-content" class="guide-content">
+                        <h3 class="text-2xl font-semibold text-gray-900 mb-6">Guías de Materias</h3>
+                        <div class="space-y-6">
+                            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                                <h4 class="text-lg font-semibold text-gray-900 mb-4">Matemáticas II</h4>
+                                <div class="grid md:grid-cols-2 gap-6">
+                                    <div>
+                                        <h5 class="font-medium text-gray-900 mb-2">Información General</h5>
+                                        <div class="text-sm text-gray-700 space-y-1">
+                                            <p><strong>Créditos:</strong> 6</p>
+                                            <p><strong>Prerrequisitos:</strong> Matemáticas I</p>
+                                            <p><strong>Horas semanales:</strong> 4 teóricas, 2 prácticas</p>
+                                            <p><strong>Profesor:</strong> Dr. García Martínez</p>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h5 class="font-medium text-gray-900 mb-2">Temario Principal</h5>
+                                        <div class="text-sm text-gray-700 space-y-1">
+                                            <p>• Límites y continuidad</p>
+                                            <p>• Derivadas y aplicaciones</p>
+                                            <p>• Integrales definidas e indefinidas</p>
+                                            <p>• Aplicaciones de la integral</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-4 pt-4 border-t border-gray-200">
+                                    <h5 class="font-medium text-gray-900 mb-2">Recursos Recomendados</h5>
+                                    <div class="text-sm text-gray-700 space-y-1">
+                                        <p>📚 <strong>Libro principal:</strong> "Cálculo" - James Stewart</p>
+                                        <p>💻 <strong>Software:</strong> GeoGebra, Wolfram Alpha</p>
+                                        <p>🎥 <strong>Videos:</strong> Khan Academy (Cálculo)</p>
+                                    </div>
+                                </div>
+                                <button class="mt-4 text-blue-600 text-sm font-medium hover:text-blue-800">Ver guía completa →</button>
+                            </div>
+
+                            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                                <h4 class="text-lg font-semibold text-gray-900 mb-4">Programación I</h4>
+                                <div class="grid md:grid-cols-2 gap-6">
+                                    <div>
+                                        <h5 class="font-medium text-gray-900 mb-2">Información General</h5>
+                                        <div class="text-sm text-gray-700 space-y-1">
+                                            <p><strong>Créditos:</strong> 8</p>
+                                            <p><strong>Prerrequisitos:</strong> Ninguno</p>
+                                            <p><strong>Horas semanales:</strong> 3 teóricas, 3 laboratorio</p>
+                                            <p><strong>Profesor:</strong> Ing. López Hernández</p>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h5 class="font-medium text-gray-900 mb-2">Temario Principal</h5>
+                                        <div class="text-sm text-gray-700 space-y-1">
+                                            <p>• Fundamentos de programación</p>
+                                            <p>• Variables y tipos de datos</p>
+                                            <p>• Estructuras de control</p>
+                                            <p>• Funciones y módulos</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-4 pt-4 border-t border-gray-200">
+                                    <h5 class="font-medium text-gray-900 mb-2">Recursos Recomendados</h5>
+                                    <div class="text-sm text-gray-700 space-y-1">
+                                        <p>🐍 <strong>Lenguaje:</strong> Python 3.9+</p>
+                                        <p>💻 <strong>IDE:</strong> PyCharm Community, VS Code</p>
+                                        <p>📚 <strong>Libro:</strong> "Automate the Boring Stuff with Python"</p>
+                                        <p>🌐 <strong>Plataforma:</strong> HackerRank, Codecademy</p>
+                                    </div>
+                                </div>
+                                <button class="mt-4 text-blue-600 text-sm font-medium hover:text-blue-800">Ver guía completa →</button>
+                            </div>
+
+                            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                                <h4 class="text-lg font-semibold text-gray-900 mb-4">Física II</h4>
+                                <div class="grid md:grid-cols-2 gap-6">
+                                    <div>
+                                        <h5 class="font-medium text-gray-900 mb-2">Información General</h5>
+                                        <div class="text-sm text-gray-700 space-y-1">
+                                            <p><strong>Créditos:</strong> 6</p>
+                                            <p><strong>Prerrequisitos:</strong> Física I, Matemáticas I</p>
+                                            <p><strong>Horas semanales:</strong> 3 teóricas, 2 laboratorio</p>
+                                            <p><strong>Profesor:</strong> Dr. Rodríguez Silva</p>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h5 class="font-medium text-gray-900 mb-2">Temario Principal</h5>
+                                        <div class="text-sm text-gray-700 space-y-1">
+                                            <p>• Electrostática</p>
+                                            <p>• Corriente eléctrica</p>
+                                            <p>• Magnetismo</p>
+                                            <p>• Ondas electromagnéticas</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-4 pt-4 border-t border-gray-200">
+                                    <h5 class="font-medium text-gray-900 mb-2">Recursos Recomendados</h5>
+                                    <div class="text-sm text-gray-700 space-y-1">
+                                        <p>📚 <strong>Libro principal:</strong> "Física" - Serway & Jewett</p>
+                                        <p>🔬 <strong>Simuladores:</strong> PhET Interactive Simulations</p>
+                                        <p>📱 <strong>Apps:</strong> Physics Toolbox Suite</p>
+                                    </div>
+                                </div>
+                                <button class="mt-4 text-blue-600 text-sm font-medium hover:text-blue-800">Ver guía completa →</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Información Section -->
+        <section id="informacion-section" class="content-section">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Información</h2>
+                <p class="text-gray-600">Información personal y calendario académico</p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-6">
+                <!-- Información Personal -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-6">Información Personal</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label>
+                                    <p class="text-gray-900">Juan Carlos Pérez González</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Número de Estudiante</label>
+                                    <p class="text-gray-900 font-mono">2024001234</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Carrera</label>
+                                    <p class="text-gray-900">Ingeniería en Sistemas Computacionales</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Ingreso</label>
+                                    <p class="text-gray-900">Agosto 2024</p>
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Semestre Actual</label>
+                                    <p class="text-gray-900">2do Semestre</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Promedio General</label>
+                                    <p class="text-gray-900 font-semibold text-green-600">8.9</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Créditos Cursados</label>
+                                    <p class="text-gray-900">24 / 240</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Estado Académico</label>
+                                    <span class="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">Activo</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información de Contacto -->
+                    <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-6">Información de Contacto</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Correo Institucional</label>
+                                    <p class="text-gray-900">juan.perez@universidad.edu.mx</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Correo Personal</label>
+                                    <p class="text-gray-900">juan.perez@gmail.com</p>
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                                    <p class="text-gray-900">+52 555 123 4567</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+                                    <p class="text-gray-900">Av. Universidad 123, Col. Educación, CDMX</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calendario Académico -->
+                <div>
+                    <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-6">Períodos Vacacionales 2024</h3>
+                        <div class="space-y-4">
+                            <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                <h4 class="font-medium text-gray-900 mb-1">Vacaciones de Invierno</h4>
+                                <p class="text-sm text-gray-600 mb-2">18 Diciembre 2023 - 8 Enero 2024</p>
+                                <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">Finalizado</span>
+                            </div>
+
+                            <div class="p-4 bg-green-50 rounded-lg border border-green-200">
+                                <h4 class="font-medium text-gray-900 mb-1">Semana Santa</h4>
+                                <p class="text-sm text-gray-600 mb-2">25 Marzo - 1 Abril 2024</p>
+                                <span class="px-2 py-1 bg-green-100 text-green-600 text-xs rounded">Próximo</span>
+                            </div>
+
+                            <div class="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                                <h4 class="font-medium text-gray-900 mb-1">Vacaciones de Verano</h4>
+                                <p class="text-sm text-gray-600 mb-2">1 Julio - 15 Agosto 2024</p>
+                                <span class="px-2 py-1 bg-yellow-100 text-yellow-600 text-xs rounded">Programado</span>
+                            </div>
+
+                            <div class="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                                <h4 class="font-medium text-gray-900 mb-1">Receso de Otoño</h4>
+                                <p class="text-sm text-gray-600 mb-2">2 - 6 Noviembre 2024</p>
+                                <span class="px-2 py-1 bg-purple-100 text-purple-600 text-xs rounded">Programado</span>
+                            </div>
+
+                            <div class="p-4 bg-red-50 rounded-lg border border-red-200">
+                                <h4 class="font-medium text-gray-900 mb-1">Vacaciones de Invierno</h4>
+                                <p class="text-sm text-gray-600 mb-2">16 Diciembre 2024 - 6 Enero 2025</p>
+                                <span class="px-2 py-1 bg-red-100 text-red-600 text-xs rounded">Programado</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 pt-6 border-t border-gray-200">
+                            <h4 class="font-medium text-gray-900 mb-3">Días Festivos 2024</h4>
+                            <div class="space-y-2 text-sm text-gray-700">
+                                <div class="flex justify-between">
+                                    <span>Día de la Constitución</span>
+                                    <span>5 Feb</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Natalicio de Benito Juárez</span>
+                                    <span>18 Mar</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Día del Trabajo</span>
+                                    <span>1 May</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Independencia de México</span>
+                                    <span>16 Sep</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Revolución Mexicana</span>
+                                    <span>18 Nov</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logout-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full text-center">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">¿Cerrar Sesión?</h3>
+            <p class="text-gray-600 mb-6">¿Estás seguro de que deseas cerrar tu sesión actual?</p>
+            <div class="flex space-x-4">
+                <button onclick="closeLogoutModal()" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                    Cancelar
+                </button>
+                <button onclick="confirmLogout()" class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Navigation functions
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName + '-section').classList.add('active');
+            
+            // Update navigation active state
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                item.classList.add('text-gray-700', 'hover:bg-gray-100');
+            });
+            
+            // Set active nav item
+            event.target.classList.add('active');
+            event.target.classList.remove('text-gray-700', 'hover:bg-gray-100');
+            
+            // Close mobile menu if open
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        // Guide section navigation
+        function showGuideSection(sectionName) {
+            // Hide all guide content sections
+            document.querySelectorAll('.guide-content').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected guide section
+            document.getElementById(sectionName + '-content').classList.add('active');
+            
+            // Update guide navigation active state
+            document.querySelectorAll('.guide-nav-item').forEach(item => {
+                item.classList.remove('active', 'bg-blue-50', 'text-blue-700');
+                item.classList.add('text-gray-700', 'hover:bg-gray-100');
+            });
+            
+            // Set active guide nav item
+            event.target.classList.add('active', 'bg-blue-50', 'text-blue-700');
+            event.target.classList.remove('text-gray-700', 'hover:bg-gray-100');
+        }
+
+        // User menu functions
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('user-dropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Mobile menu functions
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        // Logout functions
+        function logout() {
+            document.getElementById('logout-modal').classList.remove('hidden');
+            document.getElementById('user-dropdown').classList.remove('show');
+        }
+
+        function closeLogoutModal() {
+            document.getElementById('logout-modal').classList.add('hidden');
+        }
+
+        function confirmLogout() {
+            // Simulate logout process
+            alert('Sesión cerrada exitosamente. Redirigiendo al login...');
+            closeLogoutModal();
+            // Here you would typically redirect to login page
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            const userDropdown = document.getElementById('user-dropdown');
+            const userButton = event.target.closest('button');
+            
+            if (!userButton || !userButton.onclick || userButton.onclick.toString().indexOf('toggleUserMenu') === -1) {
+                userDropdown.classList.remove('show');
+            }
+        });
+
+        // Close logout modal when clicking outside
+        document.getElementById('logout-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeLogoutModal();
+            }
+        });
+
+        // Add CSS for guide content sections
+        const style = document.createElement('style');
+        style.textContent = `
+            .guide-content {
+                display: none;
+            }
+            .guide-content.active {
+                display: block;
+                animation: fadeIn 0.3s ease-in;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99157a91f04337ff',t:'MTc2MDkzMTQ2OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
